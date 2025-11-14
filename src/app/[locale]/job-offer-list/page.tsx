@@ -481,7 +481,6 @@ export default function JobOffersPage() {
         </main>
       </div>
 
-      {/* Offer Details Modal */}
       <JobOfferModal
         offer={selectedOffer}
         isOpen={isModalOpen}
