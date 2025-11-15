@@ -9,7 +9,7 @@ import type { JobOffer, Location } from "@/types/job-offer"; // ← Quitamos IUs
 
 export default function FixerProfilePage() {
   const params = useParams();
-  const fixerId = (params.id as string) || "691646c477c99dee64b21689";
+  const fixerId =   "691646c477c99dee64b21689";
   const { data: fixerProfile, isLoading: loadingFixer, error: errorFixer } = useGetFixerByIdQuery(fixerId);
   const { data: jobOffers = [], isLoading: loadingJobs } = useGetJobsByFixerQuery(fixerId);
 
@@ -86,6 +86,13 @@ export default function FixerProfilePage() {
     joinDate: fixerProfile.profile.createdAt
       ? new Date(fixerProfile.profile.createdAt).toISOString().split('T')[0]
       : "2024-01-01",
+    location: fixerProfile.profile.location
+      ? {
+          lat: fixerProfile.profile.location.lat,
+          lng: fixerProfile.profile.location.lng,
+          address: getAddress(fixerProfile.profile.location as Location),
+        }
+      : null,
     jobOffers: jobOffers.map((job: JobOffer) => ({
       id: job.id,
       title: job.title,

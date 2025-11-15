@@ -34,6 +34,11 @@ export interface Fixer {
   services: string[]
   bio?: string
   joinDate: string
+  location?: {
+    lat: number
+    lng: number
+    address?: string
+  } | null
   jobOffers: JobOffer[]
   paymentMethods: string[]
   whatsapp?: string

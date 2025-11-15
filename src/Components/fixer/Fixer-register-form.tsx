@@ -87,18 +87,17 @@ export default function FixerRegisterForm({
         </label>
         <Controller
           name="email"
-          control={control}
-          render={({ field }) => (
-            <input
-              {...field}
-              id="email"
-              type="email"
-              readOnly
-              className="w-full rounded-full border border-transparent bg-gray-200/70 px-4 py-2 text-sm outline-none cursor-not-allowed opacity-80"
-              placeholder="correo@ejemplo.com"
-            />
-          )}
-        />
+  control={control}
+  render={({ field }) => (
+    <input
+      {...field}
+      id="email"
+      type="email"
+      className="w-full rounded-full border border-transparent bg-gray-200 px-4 py-2 text-sm outline-none placeholder:text-gray-500 focus:border-blue-500 focus:bg-gray-100 focus:ring-2 focus:ring-blue-400 transition-all"
+      placeholder="correo@ejemplo.com"
+    />
+  )}
+/>
         {errors.email && (
           <div className="flex items-center gap-1 text-xs text-red-600">
             <AlertCircle className="h-3 w-3" />

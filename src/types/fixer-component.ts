@@ -34,6 +34,7 @@ export interface Fixer {
   services: string[];
   bio: string;
   joinDate: string;
+  location?: Location | null;
   jobOffers: ComponentJobOffer[];
   paymentMethods: string[];
   whatsapp: string;

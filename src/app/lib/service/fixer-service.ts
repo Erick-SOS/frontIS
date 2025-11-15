@@ -34,3 +34,4 @@ export const fixerService = {
     return URL.createObjectURL(file)
   },
 }
+//'
