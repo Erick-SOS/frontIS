@@ -1,11 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
+
 import { MapPin, Edit, Save, X, Briefcase, MessageSquare, Star, Phone, Mail } from "lucide-react"
 import Image from "next/image"
 import type { Fixer } from "@/app/lib/mock-data"
 
 export function FixerProfile({ fixer, isOwner = false }: { fixer: Fixer, isOwner?: boolean }) {
+
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     bio: fixer.bio || "",
@@ -13,7 +15,6 @@ export function FixerProfile({ fixer, isOwner = false }: { fixer: Fixer, isOwner
     city: fixer.city || "",
     whatsapp: fixer.whatsapp || ""
   })
-  
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const { name, value } = e.target
@@ -33,6 +34,17 @@ export function FixerProfile({ fixer, isOwner = false }: { fixer: Fixer, isOwner
       window.open(`https://wa.me/${fixer.whatsapp}`, "_blank")
     }
   }
+
+  const formattedJoinDate = (() => {
+    if (!fixer.joinDate) return null
+    const date = new Date(fixer.joinDate)
+    if (Number.isNaN(date.getTime())) return null
+
+    return date.toLocaleDateString("es-ES", {
+      month: "long",
+      year: "numeric",
+    })
+  })()
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -78,6 +90,11 @@ export function FixerProfile({ fixer, isOwner = false }: { fixer: Fixer, isOwner
                   {fixer.completedJobs} trabajos realizados
                 </span>
               </div>
+              {formattedJoinDate && (
+                <p className="mt-1 text-sm opacity-80">
+                  En la app desde {formattedJoinDate}
+                </p>
+              )}
               {!isOwner && fixer.whatsapp && (
                 <button
                   onClick={handleContact}
@@ -93,6 +110,7 @@ export function FixerProfile({ fixer, isOwner = false }: { fixer: Fixer, isOwner
 
         {/* Profile Content */}
         <div className="p-6">
+
           {isOwner && (
             <div className="flex justify-end mb-4">
               {isEditing ? (
@@ -144,6 +162,7 @@ export function FixerProfile({ fixer, isOwner = false }: { fixer: Fixer, isOwner
 
           {/* Contact & Services */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
             {/* Contact Info */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Información de contacto</h3>
@@ -228,8 +247,74 @@ export function FixerProfile({ fixer, isOwner = false }: { fixer: Fixer, isOwner
               )}
             </div>
           </div>
+
+          {/* Location / Map Section */}
+          {fixer.location && fixer.location.lat && fixer.location.lng && (
+            <LocationMap lat={fixer.location.lat} lng={fixer.location.lng} />
+          )}
         </div>
       </div>
+    </div>
+  )
+}
+
+function LocationMap({ lat, lng }: { lat: number; lng: number }) {
+  const mapRef = useRef<HTMLDivElement | null>(null)
+  const [mapLoaded, setMapLoaded] = useState(false)
+
+  useEffect(() => {
+    // Cargar Leaflet CSS
+    if (!document.getElementById("leaflet-css")) {
+      const link = document.createElement("link")
+      link.id = "leaflet-css"
+      link.rel = "stylesheet"
+      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      document.head.appendChild(link)
+    }
+
+    // Cargar Leaflet JS
+    if (!window.L) {
+      const script = document.createElement("script")
+      script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      script.onload = () => setMapLoaded(true)
+      document.body.appendChild(script)
+    } else {
+      setMapLoaded(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!mapLoaded || !mapRef.current || !window.L) return
+
+    const map = L.map(mapRef.current).setView([lat, lng], 14)
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(map)
+
+    L.marker([lat, lng]).addTo(map)
+
+    return () => {
+      map.remove()
+    }
+  }, [lat, lng, mapLoaded])
+
+  if (!mapLoaded) {
+    return (
+      <div className="mt-8">
+        <h3 className="text-lg font-semibold text-gray-900 mb-3">Ubicación</h3>
+        <div className="h-64 w-full rounded-xl border border-gray-200 bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
+          Cargando mapa...
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mt-8">
+      <h3 className="text-lg font-semibold text-gray-900 mb-3">Ubicación</h3>
+      <div ref={mapRef} className="h-64 w-full rounded-xl border border-gray-200" />
     </div>
   )
 }
