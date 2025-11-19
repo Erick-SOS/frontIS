@@ -17,7 +17,8 @@ export interface JobOffer {
     lng: number
     address?: string
   }
-  // Add other fields as needed
+  completedJobs: number;
+  status: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
 }
 
 export interface IUserProfile {

@@ -12,6 +12,15 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
 */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "drive.google.com",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
 export default withNextIntl(nextConfig);
